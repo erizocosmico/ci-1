@@ -35,7 +35,7 @@ git clone https://github.com/src-d/ci.git $CI_FOLDER;
 echo 'Installing landing and exporting commons...';
 git clone https://github.com/src-d/landing.git $LANDING_FOLDER && \
 cd $LANDING_FOLDER && \
-make export-landing-commons;
+make export-landing-commons target=landing-common.tar;
 
 # build error-pages hugo
 echo 'Building error pages...';
