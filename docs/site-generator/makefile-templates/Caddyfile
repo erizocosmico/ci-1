@@ -1,0 +1,12 @@
+0.0.0.0:8585 {
+    root ./public
+    log stdout
+    gzip
+
+    rewrite /${VERSION}/ {
+        regexp  ^(.*)$
+        to {1}
+    }
+
+    redir /${VERSION} /${VERSION}/
+}
