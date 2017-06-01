@@ -19,6 +19,11 @@ apk add doxygen;
 echo 'Installing node & npm...';
 apk add nodejs;
 
+# install gettext
+# gettext is installed only because of the envsubst
+echo 'Installing gettext...';
+apk add gettext;
+
 # install hugo
 echo 'Installing hugo...';
 apk add curl && \
@@ -37,9 +42,6 @@ if [ ! -d "$CI_FOLDER" ]; then
         git clone https://github.com/src-d/ci.git $CI_FOLDER;
 fi;
 
-# cache node_modules installation 
-cd "$CI_FOLDER/docs/site-generator/hugo-template" && make template-dependencies;
-
 # install landing and export commons
 if [ ! -d "$LANDING_FOLDER" ]; then
         echo 'Installing landing and exporting commons...';
@@ -50,7 +52,12 @@ fi;
 cd $LANDING_FOLDER && \
 make export-landing-commons target=landing-common.tar;
 
+# prepare all hugo template assets
+cd "$CI_FOLDER/docs/site-generator/hugo-template" \
+        && make dependencies LANDING_PATH="$LANDING_FOLDER";
+
 # build error-pages hugo
+# TODO: use the hugo-template instead
 echo 'Building error pages...';
 mkdir -p /tmp/error-pages-hugo-build && \
 cd /tmp/error-pages-hugo-build && \
