@@ -11,16 +11,35 @@
 
             {{ partial "aside_item" (dict "URL" $currentUrl "filename" "raw/LICENSE" "linkUrl" "license" "linkText" "License") }}
 
-            {{ if $project.docUrls }}
-                {{ range $doc := $project.docUrls }}
-                    {{ if eq $doc.lang "go" }}
-                        <li><a href="{{ $doc.url }}" target="_blank">Go API Documentation</a></li>
-                    {{ else if eq $doc.lang "python" }}
-                        <li><a href="{{ $doc.url }}" target="_blank">Python API Documentation</a></li>
-                    {{ else if eq $doc.lang "cpp" }}
-                        <li><a href="{{ $doc.url }}" target="_blank">C++ API Documentation</a></li>
-                    {{ else if eq $doc.lang "scala" }}
-                        <li><a href="{{ $doc.url }}" target="_blank">Scala API Documentation</a></li>
+            {{ if $project.languages }}
+                {{ $langs := split $project.languages " " }}
+                {{ range $lang := $langs }}
+                    {{ $apiUrl := printf "api/%s" $lang }}
+                    {{ $goApiUrl := printf "https://godoc.org/github.com/%s" $project.githubName }}
+                    {{ if eq $lang "go" }}
+                        <li>
+                            <a href="{{ $goApiUrl }}" target="_blank">
+                                Go API Documentation
+                            </a>
+                        </li>
+                    {{ else if eq $lang "python" }}
+                        <li>
+                            <a href="{{ $apiUrl }}" target="_blank">
+                                Python API Documentation
+                            </a>
+                        </li>
+                    {{ else if eq $lang "cpp" }}
+                        <li>
+                            <a href="{{ $apiUrl }}" target="_blank">
+                                C++ API Documentation
+                            </a>
+                        </li>
+                    {{ else if eq $lang "scala" }}
+                        <li>
+                            <a href="{{ $apiUrl }}" target="_blank">
+                                Scala API Documentation
+                            </a>
+                        </li>
                     {{end}}
                 {{ end }}
             {{ end }}

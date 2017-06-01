@@ -20,6 +20,7 @@ makefile_templates_paths = ./makefile-templates
 # Tools
 copy = cp -R
 remove = rm -rf
+move = mv -f
 
 ## Lists all recipes
 list:
@@ -33,7 +34,7 @@ template-dependencies:
 docs: prepare-hugo site-build clean-up
 
 # Prepares the hugo folder with the landing commons and the repo documentation
-prepare-hugo: ensure-building-conf copy-sources extract-repo-documentation
+prepare-hugo: copy-sources extract-repo-documentation
 
 # Copies the hugo template into the site sources folder
 copy-sources:
@@ -62,37 +63,12 @@ extract-repo-documentation:
 
 	@envsubst < $(makefile_templates_paths)/project.yml > $(project_yml_path)/project.yml
 
+generated_site_path=$(site_sources_path)/public
 # Builds the documentation-site
 site-build:
-	$(MAKE) -C $(site_sources_path) hugo-build DESTINATION=$(OUTPUT)
+	$(MAKE) -C $(site_sources_path) hugo-build DESTINATION=$(generated_site_path)
+	$(move) $(generated_site_path)/* $(OUTPUT)
 
 # Cleans up
 clean-up:
 	$(remove) $(site_sources_path)
-
-# Ensures that configuration is provided
-ensure-building-conf:
-	@if [ -z "$(SOURCES)" ]; then \
-		echo "**error 'SOURCES' is undefined. STOP"; \
-		exit 1; \
-	fi;
-	@if [ -z "$(OUTPUT)" ]; then \
-		echo "**error 'OUTPUT' is undefined. STOP"; \
-		exit 1; \
-	fi;
-	@if [ -z "$(BASEURL)" ]; then \
-		echo "**error 'BASEURL' is undefined. STOP"; \
-		exit 1; \
-	fi;
-	@if [ -z "$(REPOSITORY)" ]; then \
-		echo "**error 'REPOSITORY' is undefined. STOP"; \
-		exit 1; \
-	fi;
-	@if [ -z "$(VERSION)" ]; then \
-		echo "**error 'VERSION' is undefined. STOP"; \
-		exit 1; \
-	fi;
-	@if [ -z "$(LANGUAGES)" ]; then \
-		echo "**error 'LANGUAGES' is undefined. STOP"; \
-		exit 1; \
-	fi;
