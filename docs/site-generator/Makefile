@@ -25,10 +25,6 @@ remove = rm -rf
 list:
 	@grep '^##' Makefile -A 1
 
-## Prepares the hugo template folder fetching all its dependencies
-template-dependencies:
-	$(MAKE) -C $(hugo_template_path) dependencies LANDING_PATH=$(landing_path)
-
 ## Generates a documentation-site based in sourced-landing for the required project
 docs: prepare-hugo site-build clean-up
 

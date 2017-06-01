@@ -4,6 +4,7 @@ SHELL := /bin/bash
 # Config
 DESTINATION ?= public
 LANDING_PATH ?=
+LANDING_COMMONS := $(LANDING_PATH)/landing-common.tar
 
 # System
 url_os = 64bit
@@ -43,11 +44,14 @@ list:
 	@grep '^##' Makefile -A 1
 
 ## Install dependencies
-dependencies: hugo-dependencies import-commons npm-dependencies
+dependencies: hugo-dependencies
+	$(untar) $(LANDING_COMMONS) --directory $(shell pwd)
+	$(npm) install
+	$(npm) run build
+	$(remove) package.json webpack.config.js src node_modules
 
 ## Builds hugo project compiling assets and hugo files
 hugo-build:
-	$(npm) run build
 	$(hugo) --config=hugo.config.yaml --destination=$(DESTINATION)
 
 # Updates hugo dependencies
@@ -62,17 +66,3 @@ hugo-dependencies:
 		if [ "$(arch)" == "linux" ]; then tar -xvzf $${file}; else unzip $${file}; fi; \
 	fi;
 
-export_filename = $(shell pwd)/landing-common.tar
-file_list_name = .list.gitignore
-# Imports common stuff
-import-commons:
-	$(MAKE) -C $(LANDING_PATH) export-landing-commons \
-		target=$(export_filename) \
-		file_list_name=$(file_list_name)
-	$(untar) $(export_filename)
-	$(rename) $(file_list_name) .gitignore
-	$(remove) $(export_filename)
-
-# Prepares npm
-npm-dependencies:
-	$(npm) install
