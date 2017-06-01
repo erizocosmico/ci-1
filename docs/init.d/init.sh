@@ -38,8 +38,7 @@ if [ ! -d "$CI_FOLDER" ]; then
 fi;
 
 # cache node_modules installation 
-cd "$CI_FOLDER/hugo-template" && \
-npm install;
+cd "$CI_FOLDER/docs/site-generator/hugo-template" && make template-dependencies;
 
 # install landing and export commons
 if [ ! -d "$LANDING_FOLDER" ]; then

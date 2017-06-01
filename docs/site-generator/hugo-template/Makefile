@@ -2,74 +2,77 @@
 SHELL := /bin/bash
 
 # Config
-HUGO_VERSION := 0.21
-LANDING_RELATIVE_PATH :=  ../landing
-LANDING_COMMONS_TAR := landing-common.tar
+DESTINATION ?= public
+LANDING_PATH ?=
 
 # System
-URL_OS = 64bit
-OS = amd64
-ifeq ($(OS),Windows_NT)
-    ARCH = windows
-    URL_ARCH = Windows
+url_os = 64bit
+os = amd64
+ifeq ($(os),Windows_NT)
+    arch = windows
+    url_arch = Windows
 else
-    UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Linux)
-			ARCH = linux
-			URL_ARCH = Linux
+    uname_s := $(shell uname -s)
+    ifeq ($(uname_s),Linux)
+			arch = linux
+			url_arch = Linux
     endif
-    ifeq ($(UNAME_S),Darwin)
-			ARCH = darwin
-			URL_ARCH = MacOS
+    ifeq ($(uname_s),Darwin)
+			arch = darwin
+			url_arch = MacOS
     endif
 endif
 
-# Environment
-BASE_PATH := $(shell pwd)
-HUGO_PATH := $(BASE_PATH)/.hugo
-HUGO_URL = github.com/spf13/hugo
-HUGO_NAME := hugo
-HUGO_URL_NAME := hugo_$(HUGO_VERSION)_$(URL_ARCH)-$(URL_OS)
+# Hugo variables
+hugo_version := 0.21
+hugo_path := $(shell pwd)/.hugo
+hugo_url = github.com/spf13/hugo
+hugo_url_name := hugo_$(hugo_version)_$(url_arch)-$(url_os)
 
 # Tools
-CURL = curl -L
-HUGO = $(HUGO_PATH)/$(HUGO_NAME)
-MKDIR = mkdir -p
-NPM = npm
+curl = curl -L
+hugo = $(hugo_path)/hugo
+mkdir = mkdir -p
+npm = npm
+untar = tar -xf
+rename = mv
+remove = rm -rf
 
 ## Lists all recipes
 list:
 	@grep '^##' Makefile -A 1
 
+## Install dependencies
+dependencies: hugo-dependencies import-commons npm-dependencies
+
+## Builds hugo project compiling assets and hugo files
+hugo-build:
+	$(npm) run build
+	$(hugo) --config=hugo.config.yaml --destination=$(DESTINATION)
+
 # Updates hugo dependencies
 hugo-dependencies:
-	@if [[ ! -f $(HUGO) ]]; then \
-		$(MKDIR) $(HUGO_PATH); \
-		cd $(HUGO_PATH); \
+	@if [[ ! -f $(hugo) ]]; then \
+		$(mkdir) $(hugo_path); \
+		cd $(hugo_path); \
 		ext="zip"; \
-		if [ "$(ARCH)" == "linux" ]; then ext="tar.gz"; fi; \
+		if [ "$(arch)" == "linux" ]; then ext="tar.gz"; fi; \
 		file="hugo.$${ext}"; \
-		$(CURL) https://$(HUGO_URL)/releases/download/v$(HUGO_VERSION)/$(HUGO_URL_NAME).$${ext} -o $${file}; \
-		if [ "$(ARCH)" == "linux" ]; then tar -xvzf $${file}; else unzip $${file}; fi; \
+		$(curl) https://$(hugo_url)/releases/download/v$(hugo_version)/$(hugo_url_name).$${ext} -o $${file}; \
+		if [ "$(arch)" == "linux" ]; then tar -xvzf $${file}; else unzip $${file}; fi; \
 	fi;
+
+export_filename = $(shell pwd)/landing-common.tar
+file_list_name = .list.gitignore
+# Imports common stuff
+import-commons:
+	$(MAKE) -C $(LANDING_PATH) export-landing-commons \
+		target=$(export_filename) \
+		file_list_name=$(file_list_name)
+	$(untar) $(export_filename)
+	$(rename) $(file_list_name) .gitignore
+	$(remove) $(export_filename)
 
 # Prepares npm
 npm-dependencies:
-	$(NPM) install
-	$(NPM) run build
-
-## Builds hugo project
-hugo-build: npm-dependencies hugo-dependencies
-	$(HUGO) --config=hugo.config.yaml --destination=public
-
-# Runs hugo server
-hugo-server:
-	$(HUGO) server --config=hugo.config.yaml --destination=public --port=8585 --watch --buildDrafts -b http://tacoshrimp.com
-
-## Cleans and run a new hugo server with webpack watcher enabled
-landing-local-serve: hugo-clean npm-dependencies hugo-dependencies
-	$(NPM) run serve
-
-# Deletes the hugo folder
-hugo-clean:
-	rm -rf $(HUGO_PATH)
+	$(npm) install

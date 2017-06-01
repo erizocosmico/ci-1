@@ -4,9 +4,7 @@
   "description": "source{d} projects documentation",
   "main": "./src/js/index.js",
   "scripts": {
-    "build": "webpack --config=webpack.config.js",
-    "webpack-watcher": "webpack --config=webpack.config.js --watch --debug --verbose --progress --colors",
-    "serve": "concurrently --kill-others \"npm run webpack-watcher\" \"make hugo-server\""
+    "build": "webpack --config=webpack.config.js"
   },
   "devDependencies": {
     "autoprefixer": "^6.5.3",
