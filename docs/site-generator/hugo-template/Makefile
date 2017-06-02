@@ -19,7 +19,7 @@ curl := curl -L
 mkdir := mkdir -p
 npm := npm
 untar := tar -xf
-unzip := tar -zxf
+untargz := tar -zxf
 rename := mv
 remove := rm -rf
 hugo_exec = $(hugo_path)/hugo
@@ -42,8 +42,8 @@ hugo-dependencies:
 	@if [[ ! -f $(hugo_exec) ]]; then \
 		$(mkdir) $(hugo_path); \
 		cd $(hugo_path); \
-		$(curl) https://github.com/spf13/hugo/releases/download/v$(hugo_version)/$(hugo_zip_name); \
-		$(extract) $(hugo_zip_name); \
+		$(curl) -o $(hugo_zip_name) https://github.com/spf13/hugo/releases/download/v$(hugo_version)/$(hugo_zip_name); \
+		$(untargz) $(hugo_zip_name); \
 	fi;
 
 export_filename = $(shell pwd)/landing-common.tar
@@ -54,8 +54,8 @@ import-commons:
 		target=$(export_filename) \
 		file_list_name=$(file_list_name)
 	$(untar) $(export_filename)
-	$(rename) $(file_list_name) .gitignore
 	$(remove) $(export_filename)
+	$(rename) $(file_list_name) .gitignore
 
 # Prepares npm and run webpack to compile the assets
 npm-dependencies:
