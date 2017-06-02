@@ -21,19 +21,21 @@ makefile_templates_paths = ./makefile-templates
 copy = cp -R
 remove = rm -rf
 move = mv -f
+mkdir = mkdir -p
 
 ## Lists all recipes
 list:
 	@grep '^##' Makefile -A 1
 
 ## Generates a documentation-site based in sourced-landing for the required project
-docs: prepare-hugo site-build clean-up
+docs: copy-sources extract-repo-documentation site-build clean-up
 
-# Prepares the hugo folder with the landing commons and the repo documentation
-prepare-hugo: copy-sources extract-repo-documentation
+## Generates a landing-like site for serving 404 and 500 errors
+error-site: copy-sources site-build clean-up
 
 # Copies the hugo template into the site sources folder
 copy-sources:
+	$(mkdir) $(site_sources_path)
 	$(remove) $(site_sources_path)
 	$(copy) $(hugo_template_path) $(site_sources_path)
 
@@ -63,6 +65,7 @@ generated_site_path=$(site_sources_path)/public
 # Builds the documentation-site
 site-build:
 	$(MAKE) -C $(site_sources_path) hugo-build DESTINATION=$(generated_site_path)
+	$(mkdir) $(OUTPUT)
 	$(move) $(generated_site_path)/* $(OUTPUT)
 
 # Cleans up

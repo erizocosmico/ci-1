@@ -34,6 +34,7 @@
         }
 
         .content {
+            min-height: 300px;
             flex-grow: 1;
             flex-shrink: 1;
             padding: $margin (2 * $margin);

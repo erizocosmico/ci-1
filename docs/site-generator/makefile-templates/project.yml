@@ -4,6 +4,5 @@ githubName: ${OWNER}/${REPOSITORY}
 repoUrl: https://github.com/${OWNER}/${REPOSITORY}
 repoVersionUrl: https://github.com/${OWNER}/${REPOSITORY}/releases/tag/${VERSION}
 issuesUrl: https://github.com/${OWNER}/${REPOSITORY}/issues
-docUrl: https://godoc.org/gopkg.in/${OWNER}/${REPOSITORY}.${VERSION}
 baseURL: ${BASEURL}
 languages: ${LANGUAGES}
